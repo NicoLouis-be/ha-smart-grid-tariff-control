@@ -10,6 +10,8 @@ This repository contains **three Home Assistant automations** that actively cont
 based on **real‑time dynamic import and export prices**.
 
 ![Power overview](./images/vermogen.png)
+
+![Legenda](./images/legende.png)
 ---
 
 ## 🚀 Project Goals
