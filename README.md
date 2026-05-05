@@ -57,13 +57,14 @@ available flexible loads
 
 
 ## 🧠 Energy Control Logic
-Phase 1 – Pay to Consume, Get Paid to Inject
-### Situation
+
+### Phase 1 – Pay to Consume, Get Paid to Inject
+#### Situation
 
 Import price > 0
 Export price > 0
 
-Strategy
+#### Strategy
 
 Prioritize self‑consumption
 Inject excess solar energy into the grid
@@ -72,25 +73,25 @@ Avoid unnecessary grid consumption
 This is the “classic” operating mode where solar surplus is profitable to export.
 
 ### Phase 2 – Pay to Consume and Pay to Inject
-Situation
+#### Situation
 
 Import price > 0
 Export price < 0
 
 Exporting power costs money and should be avoided.
 This phase is split into three sub‑phases depending on battery capacity.
-Phase 2.1 – Both batteries not full
+#### Phase 2.1 – Both batteries not full
 
 Excess solar power is used to charge both batteries
 Grid injection is fully avoided
 
-Phase 2.2 – One battery full
+#### Phase 2.2 – One battery full
 
 Remaining battery continues charging
 Flexible loads (EV / heat pump) are enabled if possible
 Grid injection is still minimized
 
-Phase 2.3 – Both batteries full
+#### Phase 2.3 – Both batteries full
 
 Batteries can no longer absorb excess power
 Flexible loads are prioritized
@@ -98,12 +99,12 @@ Limited grid injection may occur as a last resort
 
 
 ### Phase 3 – Get Paid to Consume, Pay to Inject
-Situation
+#### Situation
 
 Import price < 0
 Export price < 0
 
-Strategy
+#### Strategy
 
 Actively consume electricity from the grid
 Charge batteries from the grid
@@ -120,7 +121,7 @@ Negative values → grid consumption
 Colored areas represent interaction between solar production, batteries, and grid
 
 Operating phases are clearly marked to show how the automations react to changing tariff conditions.
-vermogen.png
+
 
 ## 🧩 Requirements
 To use or adapt these automations, you will typically need:
