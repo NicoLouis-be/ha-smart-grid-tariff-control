@@ -32,10 +32,7 @@ Max charge / discharge: 2.5 kW each
 
 
 ### 🚗 Electric Vehicle (EV)
-🌡 Heat pump
-
-Domestic hot water
-Floor heating
+🌡 Heat pump for Domestic hot water and Floor heating
 
 
 ### ⚡ Dynamic electricity contract
@@ -89,13 +86,13 @@ Grid injection is fully avoided
 
 Remaining battery continues charging
 Flexible loads (EV / heat pump) are enabled if possible
-Grid injection is still minimized
+Curtailing is needed depending on the consumed power of the house
 
 #### Phase 2.3 – Both batteries full
 
 Batteries can no longer absorb excess power
 Flexible loads are prioritized
-Limited grid injection may occur as a last resort
+Curtailing is needed depending on the consumed power of the house
 
 
 ### Phase 3 – Get Paid to Consume, Pay to Inject
@@ -109,39 +106,24 @@ Export price < 0
 Actively consume electricity from the grid
 Charge batteries from the grid
 Run EV charging and heat pump loads
-Avoid solar injection as much as possible
+Turn off solar
 
 This phase takes advantage of negative electricity prices on the consumption side.
-
-## 📊 Energy Flow Example
-The figure below shows a real‑world day of power flow (kW):
-
-Positive values → grid injection
-Negative values → grid consumption
-Colored areas represent interaction between solar production, batteries, and grid
-
-Operating phases are clearly marked to show how the automations react to changing tariff conditions.
-
 
 ## 🧩 Requirements
 To use or adapt these automations, you will typically need:
 
 ### Home Assistant
 Sensors for:
-
-### solar production
-battery state of charge
-grid import/export power
-dynamic import & export prices
-
+- solar production
+- battery state of charge
+- grid import/export power
+- dynamic import & export prices
 
 Entities to control:
-
-battery charging
-EV charging
-heat pump (or other shiftable loads)
-
-
+- battery charging
+- EV charging
+- heat pump (or other shiftable loads)
 
 Exact integrations depend on your hardware and energy provider.
 
