@@ -119,6 +119,10 @@ Sensors for:
 - battery state of charge
 - grid import/export power
 - dynamic import & export prices
+- power of the house: 
+```
+{{states.sensor.inverter_active_power.state |float + states.sensor.marstek_ac_vermogen.state |float+ states.sensor.marstek_2_ac_vermogen.state |float+ states.sensor.p1_meter_vermogen.state |float}}
+```
 
 Entities to control:
 - battery charging
