@@ -1,0 +1,120 @@
+alias: Zonnepanelen beperken
+description: ""
+triggers:
+  - trigger: state
+    entity_id:
+      - sensor.p1_meter_vermogen
+    for:
+      hours: 0
+      minutes: 0
+      seconds: 0
+conditions:
+  - condition: numeric_state
+    entity_id: sensor.dynamische_injectie_prijzen_15m_current_electricity_market_price
+    below: -0.001
+actions:
+  - choose:
+      - conditions:
+          - condition: and
+            conditions:
+              - type: is_battery_level
+                condition: device
+                device_id: 54cc1f6f88e2216a3fce7d5fa43bcf46
+                entity_id: cf25ae547049f7d6526cfa54d2f0b177
+                domain: sensor
+                above: 99
+              - type: is_battery_level
+                condition: device
+                device_id: c49028cecd4ea213d852168bad650440
+                entity_id: e71b046ef01351ca24143e8e9b10cee5
+                domain: sensor
+                above: 99
+        sequence:
+          - target:
+              entity_id: number.omvormer_vermogensbeperking
+            data:
+              value: |
+                {% set power = states('sensor.huis_power') | float  %}
+                {% if power > 5000 %}
+                5000
+                {% else %}
+                  {{power}}
+                {% endif %}
+            action: number.set_value
+            enabled: true
+        alias: Batterijen vol
+      - conditions:
+          - condition: or
+            conditions:
+              - condition: and
+                conditions:
+                  - type: is_battery_level
+                    condition: device
+                    device_id: 54cc1f6f88e2216a3fce7d5fa43bcf46
+                    entity_id: cf25ae547049f7d6526cfa54d2f0b177
+                    domain: sensor
+                    below: 98
+                  - type: is_battery_level
+                    condition: device
+                    device_id: c49028cecd4ea213d852168bad650440
+                    entity_id: e71b046ef01351ca24143e8e9b10cee5
+                    domain: sensor
+                    above: 99
+              - condition: and
+                conditions:
+                  - type: is_battery_level
+                    condition: device
+                    device_id: 54cc1f6f88e2216a3fce7d5fa43bcf46
+                    entity_id: cf25ae547049f7d6526cfa54d2f0b177
+                    domain: sensor
+                    above: 99
+                  - type: is_battery_level
+                    condition: device
+                    device_id: c49028cecd4ea213d852168bad650440
+                    entity_id: e71b046ef01351ca24143e8e9b10cee5
+                    domain: sensor
+                    below: 98
+        sequence:
+          - target:
+              entity_id: number.omvormer_vermogensbeperking
+            data:
+              value: |
+                {% set power = states('sensor.huis_power') | float + 2400 %}
+                {% if power > 5000 %}
+                5000
+                {% else %}
+                  {{power}}
+                {% endif %}
+            action: number.set_value
+            enabled: true
+        alias: 1 Batterij vol, 1 batterij nog niet vol
+      - conditions:
+          - condition: and
+            conditions:
+              - type: is_battery_level
+                condition: device
+                device_id: 54cc1f6f88e2216a3fce7d5fa43bcf46
+                entity_id: cf25ae547049f7d6526cfa54d2f0b177
+                domain: sensor
+                below: 98
+              - type: is_battery_level
+                condition: device
+                device_id: c49028cecd4ea213d852168bad650440
+                entity_id: e71b046ef01351ca24143e8e9b10cee5
+                domain: sensor
+                below: 98
+        sequence:
+          - target:
+              entity_id: number.omvormer_vermogensbeperking
+            data:
+              value: "5000"
+            action: number.set_value
+        alias: batterijen nog niet vol
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 5
+      milliseconds: 0
+trace:
+  stored_traces: 20
+mode: single

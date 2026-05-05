@@ -1,0 +1,118 @@
+alias: Zonnepanelen uitschakelen bij onder 0 prijzen
+description: ""
+triggers:
+  - type: value
+    device_id: 52576346e960b481ce0d257e2c12f05e
+    entity_id: 93d788c3123e77fbc94e2bcc4416e516
+    domain: sensor
+    trigger: device
+    below: -0.05
+    id: geld krijgen om te verbruiken
+  - type: value
+    device_id: 52576346e960b481ce0d257e2c12f05e
+    entity_id: 93d788c3123e77fbc94e2bcc4416e516
+    domain: sensor
+    trigger: device
+    id: geld betalen om te verbruiken
+    above: -0.05
+conditions: []
+actions:
+  - choose:
+      - conditions:
+          - condition: trigger
+            id:
+              - geld krijgen om te verbruiken
+        sequence:
+          - action: automation.turn_off
+            metadata: {}
+            target:
+              entity_id:
+                - automation.inverter_terugschroeven
+                - automation.vermogensbeperking_resetten
+            data:
+              stop_actions: true
+          - device_id: 9bd311630eec195f488b580a3a978099
+            domain: number
+            entity_id: abe0aea100b8205f027255cfa7134474
+            type: set_value
+            value: 0
+          - action: switch.turn_off
+            metadata: {}
+            target:
+              entity_id: switch.inverter_none
+            data: {}
+          - action: number.set_value
+            metadata: {}
+            target:
+              entity_id:
+                - number.marstek_venus_modbus_forceer_laadvermogen
+                - number.marstek_2_forceer_laadvermogen
+            data:
+              value: "1000"
+          - action: select.select_option
+            metadata: {}
+            target:
+              entity_id:
+                - select.marstek_venus_modbus_geforceerde_modus
+                - select.marstek_2_geforceerde_modus
+            data:
+              option: charge
+          - action: switch.turn_on
+            metadata: {}
+            target:
+              entity_id:
+                - switch.marstek_venus_modbus_rs485_besturingsmodus
+                - switch.marstek_2_rs485_bedrijfsmodus
+            data: {}
+      - conditions:
+          - condition: trigger
+            id:
+              - geld betalen om te verbruiken
+        sequence:
+          - action: automation.turn_on
+            metadata: {}
+            target:
+              entity_id:
+                - automation.inverter_terugschroeven
+                - automation.vermogensbeperking_resetten
+            data: {}
+          - action: switch.turn_on
+            metadata: {}
+            target:
+              entity_id: switch.inverter_none
+            data: {}
+          - action: switch.turn_off
+            metadata: {}
+            target:
+              entity_id:
+                - switch.marstek_venus_modbus_rs485_besturingsmodus
+                - switch.marstek_2_rs485_bedrijfsmodus
+            data: {}
+          - action: number.min
+            metadata: {}
+            target:
+              entity_id:
+                - number.marstek_venus_modbus_forceer_laadvermogen
+                - number.marstek_2_forceer_laadvermogen
+            data: {}
+          - action: select.select_option
+            metadata: {}
+            target:
+              entity_id:
+                - select.marstek_venus_modbus_geforceerde_modus
+                - select.marstek_2_geforceerde_modus
+            data:
+              option: stop
+          - device_id: 54cc1f6f88e2216a3fce7d5fa43bcf46
+            domain: select
+            entity_id: 2ab404d157a2b3fbe68d4c00a3dc64bf
+            type: select_option
+            option: anti_feed
+          - device_id: c49028cecd4ea213d852168bad650440
+            domain: select
+            entity_id: 14dc81da35d3bdf96ae45aa64d4fb39a
+            type: select_option
+            option: anti_feed
+mode: single
+trace:
+  stored_traces: 20

@@ -1,0 +1,22 @@
+alias: zonnepanelen beperken resetten
+description: ""
+triggers:
+  - trigger: numeric_state
+    entity_id:
+      - sensor.dynamische_injectie_prijzen_15m_current_electricity_market_price
+    above: 0
+conditions: []
+actions:
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 20
+      milliseconds: 0
+  - action: number.set_value
+    metadata: {}
+    target:
+      entity_id: number.omvormer_vermogensbeperking
+    data:
+      value: "5000"
+    enabled: true
+mode: single
