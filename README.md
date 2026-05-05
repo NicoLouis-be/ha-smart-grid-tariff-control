@@ -1,4 +1,4 @@
-Home Assistant – Dynamic Tariff Energy Control
+# Home Assistant – Dynamic Tariff Energy Control
 Smart energy flow control for households with solar panels, home batteries, EV charging, and heat pumps, optimized for dynamic electricity tariffs.
 This repository provides Home Assistant automations that dynamically decide when to:
 
@@ -9,7 +9,7 @@ shift flexible loads such as EV charging and heat pump operation,
 
 all based on real‑time import and export electricity prices.
 
-🚀 Project Goals
+## 🚀 Project Goals
 
 Maximize financial return under dynamic pricing
 Prevent costly grid injection during negative export prices
@@ -18,27 +18,27 @@ Automatically adapt energy behavior without manual intervention
 Provide a transparent and extendable reference setup for Home Assistant users
 
 
-🏠 System Overview
+## 🏠 System Overview
 This project is designed around the following hardware setup:
 
-☀️ Solar PV system
+### ☀️ Solar PV system
 
 Peak production: 5 kW
 
 
-🔋 2 plug‑in batteries
+### 🔋 2 plug‑in batteries
 
 Max charge / discharge: 2.5 kW each
 
 
-🚗 Electric Vehicle (EV)
+### 🚗 Electric Vehicle (EV)
 🌡 Heat pump
 
 Domestic hot water
 Floor heating
 
 
-⚡ Dynamic electricity contract
+### ⚡ Dynamic electricity contract
 
 Import and export prices vary independently
 Prices can be positive or negative
@@ -46,7 +46,7 @@ Prices can be positive or negative
 
 
 
-🤖 Included Automations
+## 🤖 Included Automations
 The repository contains three Home Assistant automations, each corresponding to a tariff situation commonly found in dynamic electricity markets.
 The automations run continuously and evaluate:
 
@@ -56,9 +56,9 @@ battery state of charge
 available flexible loads
 
 
-🧠 Energy Control Logic
+## 🧠 Energy Control Logic
 Phase 1 – Pay to Consume, Get Paid to Inject
-Situation
+### Situation
 
 Import price > 0
 Export price > 0
@@ -71,7 +71,7 @@ Avoid unnecessary grid consumption
 
 This is the “classic” operating mode where solar surplus is profitable to export.
 
-Phase 2 – Pay to Consume and Pay to Inject
+### Phase 2 – Pay to Consume and Pay to Inject
 Situation
 
 Import price > 0
@@ -97,7 +97,7 @@ Flexible loads are prioritized
 Limited grid injection may occur as a last resort
 
 
-Phase 3 – Get Paid to Consume, Pay to Inject
+### Phase 3 – Get Paid to Consume, Pay to Inject
 Situation
 
 Import price < 0
@@ -112,7 +112,7 @@ Avoid solar injection as much as possible
 
 This phase takes advantage of negative electricity prices on the consumption side.
 
-📊 Energy Flow Example
+## 📊 Energy Flow Example
 The figure below shows a real‑world day of power flow (kW):
 
 Positive values → grid injection
@@ -122,13 +122,13 @@ Colored areas represent interaction between solar production, batteries, and gri
 Operating phases are clearly marked to show how the automations react to changing tariff conditions.
 vermogen.png
 
-🧩 Requirements
+## 🧩 Requirements
 To use or adapt these automations, you will typically need:
 
-Home Assistant
+### Home Assistant
 Sensors for:
 
-solar production
+### solar production
 battery state of charge
 grid import/export power
 dynamic import & export prices
@@ -144,7 +144,7 @@ heat pump (or other shiftable loads)
 
 Exact integrations depend on your hardware and energy provider.
 
-🔧 Customization
+## 🔧 Customization
 This project is intentionally modular:
 
 Battery thresholds can be adjusted
@@ -154,6 +154,6 @@ Logic can be extended with forecasts or day‑ahead pricing
 
 It is meant to be adapted, not copied blindly.
 
-⚠️ Disclaimer
+## ⚠️ Disclaimer
 This project controls energy flows that can have financial consequences.
 Always validate behavior with simulations, logs, and limits before running unattended.
