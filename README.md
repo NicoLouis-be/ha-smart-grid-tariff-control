@@ -1,146 +1,165 @@
 # Home Assistant – Dynamic Tariff Energy Control
-Smart energy flow control for households with solar panels, home batteries, EV charging, and heat pumps, optimized for dynamic electricity tariffs.
-This repository provides Home Assistant automations that dynamically decide when to:
 
-inject electricity into the grid,
-consume electricity from the grid,
-charge or hold batteries,
-shift flexible loads such as EV charging and heat pump operation,
+Smart energy flow control for households with **solar panels, home batteries, EV charging, and heat pumps**, optimized for **dynamic electricity tariffs**.
 
-all based on real‑time import and export electricity prices.
+This repository contains **three Home Assistant automations** that actively control:
+- inverter power limits
+- battery charge behavior
+- grid injection and grid consumption
+
+based on **real‑time dynamic import and export prices**.
+
+---
 
 ## 🚀 Project Goals
 
-Maximize financial return under dynamic pricing
-Prevent costly grid injection during negative export prices
-Increase self‑consumption of solar energy
-Automatically adapt energy behavior without manual intervention
-Provide a transparent and extendable reference setup for Home Assistant users
+- Avoid paying for grid injection during negative prices  
+- Exploit negative consumption prices when available  
+- Automatically manage inverter and battery behavior  
+- Reduce manual intervention and tariff‑related mistakes  
 
+---
 
 ## 🏠 System Overview
-This project is designed around the following hardware setup:
 
-### ☀️ Solar PV system
+- ☀️ **Solar PV system**  
+  - Peak production: **5 kW**
+- 🔋 **2 plug‑in batteries**  
+  - Charge / discharge power: **≈2.5 kW per battery**
+- 🚗 **Electric Vehicle**
+- 🌡 **Heat pump**  
+  - Domestic hot water  
+  - Floor heating
+- ⚡ **Dynamic electricity contract**
+  - Separate import & export prices
+  - Prices can be positive or negative
 
-Peak production: 5 kW
+---
 
+## 🤖 Automations Overview
 
-### 🔋 2 plug‑in batteries
+| Phase | File | Purpose |
+|------|-----|---------|
+| Phase 1 | `phase1.yaml` | Restore full inverter export when injection is profitable |
+| Phase 2 | `phase2.yaml` | Limit solar production to avoid paid injection |
+| Phase 3 | `phase3.yaml` | Force grid consumption when electricity prices are negative |
 
-Max charge / discharge: 2.5 kW each
-
-
-### 🚗 Electric Vehicle (EV)
-🌡 Heat pump for Domestic hot water and Floor heating
-
-
-### ⚡ Dynamic electricity contract
-
-Import and export prices vary independently
-Prices can be positive or negative
-
-
-
-
-## 🤖 Included Automations
-The repository contains three Home Assistant automations, each corresponding to a tariff situation commonly found in dynamic electricity markets.
-The automations run continuously and evaluate:
-
-current import & export price
-solar production
-battery state of charge
-available flexible loads
-
+---
 
 ## 🧠 Energy Control Logic
 
-### Phase 1 – Pay to Consume, Get Paid to Inject
-#### Situation
+### 🔹 Phase 1 – Pay to Consume, Get Paid to Inject
+**File:** `phase1.yaml`
 
-Import price > 0
-Export price > 0
+#### Trigger
+- Injection price becomes **positive**
 
-#### Strategy
+#### Actions
+- Reset inverter export limit to **5000 W**
+- Remove any previous solar production limitation
 
-Prioritize self‑consumption
-Inject excess solar energy into the grid
-Avoid unnecessary grid consumption
+#### Purpose
+Ensures the inverter returns to full operation once injection becomes profitable again.
 
-This is the “classic” operating mode where solar surplus is profitable to export.
+---
 
-### Phase 2 – Pay to Consume and Pay to Inject
-#### Situation
+### 🔹 Phase 2 – Pay to Consume and Pay to Inject
+**File:** `phase2.yaml`
 
-Import price > 0
-Export price < 0
+Injection prices are negative, so exporting power must be avoided.  
+The inverter output is dynamically limited based on battery state of charge.
 
-Exporting power costs money and should be avoided.
-This phase is split into three sub‑phases depending on battery capacity.
 #### Phase 2.1 – Both batteries not full
-
-Excess solar power is used to charge both batteries
-Grid injection is fully avoided
+- Both batteries < **98 %**
+- Inverter limit set to **5000 W**
+- Excess solar power is used to charge the batteries
 
 #### Phase 2.2 – One battery full
-
-Remaining battery continues charging
-Flexible loads (EV / heat pump) are enabled if possible
-Curtailing is needed depending on the consumed power of the house
+- One battery > **99 %**
+- One battery < **98 %**
+- Inverter limit = `house power + 2400 W` (capped at 5000 W)
+- Remaining battery continues charging without grid injection
 
 #### Phase 2.3 – Both batteries full
+- Both batteries > **99 %**
+- Inverter limit follows household consumption
+- Grid injection is minimized as much as possible
 
-Batteries can no longer absorb excess power
-Flexible loads are prioritized
-Curtailing is needed depending on the consumed power of the house
+---
 
+### 🔹 Phase 3 – Get Paid to Consume, Pay to Inject
+**File:** `phase3.yaml`
 
-### Phase 3 – Get Paid to Consume, Pay to Inject
-#### Situation
+#### Trigger
+- Electricity price crosses **−0.05**
+  - Below → get paid to consume
+  - Above → pay to consume
 
-Import price < 0
-Export price < 0
+#### When getting paid to consume
+- Disable inverter throttling automations
+- Set inverter output to **0**
+- Disable inverter export
+- Force both batteries into **charge mode**
+- Enable RS485 battery control
+- Actively charge batteries from the grid
 
-#### Strategy
+#### When paying to consume again
+- Re‑enable inverter control
+- Disable forced battery charging
+- Restore inverter anti‑feed configuration
 
-Actively consume electricity from the grid
-Charge batteries from the grid
-Run EV charging and heat pump loads
-Turn off solar
+---
 
-This phase takes advantage of negative electricity prices on the consumption side.
+## 📊 Energy Flow Example
+
+The image below shows a real‑world energy flow day with operating phases annotated.
+
+![Energy Flow Diagram](images/Designer.png)
+
+- Positive values → **grid injection**
+- Negative values → **grid consumption**
+
+---
 
 ## 🧩 Requirements
-To use or adapt these automations, you will typically need:
 
-### Home Assistant
-Sensors for:
-- solar production
-- battery state of charge
-- grid import/export power
-- dynamic import & export prices
-- power of the house: 
+- Home Assistant
+- Sensors for:
+  - solar production
+  - battery state of charge
+  - grid import/export power
+  - dynamic import & export prices
+  - power of the house: 
 ```
 {{states.sensor.inverter_active_power.state |float + states.sensor.marstek_ac_vermogen.state |float+ states.sensor.marstek_2_ac_vermogen.state |float+ states.sensor.p1_meter_vermogen.state |float}}
 ```
+- Controllable entities for:
+  - inverter power limit
+  - battery charging mode
+  - EV charger and/or heat pump (optional)
 
-Entities to control:
-- battery charging
-- EV charging
-- heat pump (or other shiftable loads)
-
-Exact integrations depend on your hardware and energy provider.
+---
 
 ## 🔧 Customization
-This project is intentionally modular:
 
-Battery thresholds can be adjusted
-Power limits are configurable
-Additional loads can be added easily
-Logic can be extended with forecasts or day‑ahead pricing
+This setup is intentionally modular:
 
-It is meant to be adapted, not copied blindly.
+- Thresholds can be adjusted
+- Power limits can be tuned
+- Additional controllable loads can be integrated
+- Logic can be extended with forecasts or day‑ahead prices
+
+---
 
 ## ⚠️ Disclaimer
-This project controls energy flows that can have financial consequences.
-Always validate behavior with simulations, logs, and limits before running unattended.
+
+These automations directly influence **energy costs and grid behavior**.  
+Always validate, monitor logs, and test carefully before unattended use.
+
+---
+
+## 🤝 Contributing
+
+Improvements, alternative strategies, and adaptations for different markets or hardware are welcome.
+
+Feel free to open an issue or pull request.
